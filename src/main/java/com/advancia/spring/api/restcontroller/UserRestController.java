@@ -38,11 +38,6 @@ public class UserRestController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> getMethodName() {
-        return new ResponseEntity<>("you're accepted!", HttpStatus.OK);
-    }
-
     @PostMapping("/logged-user-products")
     public ResponseEntity<LoggedUserResponseDTO> getLoggedUserProducts(@RequestBody UserDataDTO userDataDTO) {
         LoggedUserResponseDTO responseDTO = userRestService.getLoggedUserProducts(userDataDTO);
