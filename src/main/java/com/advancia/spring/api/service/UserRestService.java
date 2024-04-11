@@ -19,6 +19,7 @@ import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
+import com.advancia.spring.auth.db.pojo.Role;
 import com.advancia.spring.auth.db.pojo.User;
 import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.auth.service.JwtService;
@@ -45,6 +46,8 @@ public class UserRestService {
     public AuthenticationResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
 
         AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
+
+        userSignUpDataDTO.setRuolo(Role.USER);
 
         if (userService.loadUserByUsername(userSignUpDataDTO.getEmail()) != null) {
             responseDTO.setEsito(false);
