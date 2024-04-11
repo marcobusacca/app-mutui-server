@@ -16,11 +16,9 @@ import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
 import com.advancia.spring.api.service.UserRestService;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api")
-// @CrossOrigin({ "http://localhost:5173", "http://localhost:4200" })
 public class UserRestController {
 
     @Autowired
