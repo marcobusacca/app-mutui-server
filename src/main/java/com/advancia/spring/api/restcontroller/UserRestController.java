@@ -29,9 +29,6 @@ public class UserRestController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDTO> signUp(@RequestBody UserSignUpDataDTO userSignUpDataDTO) {
         AuthenticationResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO);
-        if (responseDTO.getToken() == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-        }
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
