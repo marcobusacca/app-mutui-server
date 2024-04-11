@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.advancia.spring.auth.db.pojo.User;
@@ -18,13 +17,14 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+    // 256 BIT SECRET KEY GENERATED
     private final String SECRET_KEY = "b7b74c02187c8d395713a3428e1f56d95576888449173d724c54de37c7f8f06c";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public boolean isValid(String token, UserDetails user) {
+    public boolean isValid(String token, User user) {
         String username = extractUsername(token);
         return (username.equals(user.getUsername())) && !isTokenExpired(token);
     }

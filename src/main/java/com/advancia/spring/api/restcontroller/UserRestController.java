@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.advancia.spring.api.dto.user.UserDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
 import com.advancia.spring.api.service.UserRestService;
-import com.advancia.spring.auth.db.pojo.User;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api")
@@ -25,15 +27,23 @@ public class UserRestController {
     private UserRestService userRestService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDTO> signUp(@RequestBody User request) {
-        AuthenticationResponseDTO responseDTO = userRestService.signUp(request);
+    public ResponseEntity<AuthenticationResponseDTO> signUp(@RequestBody UserSignUpDataDTO userSignUpDataDTO) {
+        AuthenticationResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO);
+        if (responseDTO.getToken() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody User request) {
-        AuthenticationResponseDTO responseDTO = userRestService.login(request);
+    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody UserLoginDataDTO userLoginDataDTO) {
+        AuthenticationResponseDTO responseDTO = userRestService.login(userLoginDataDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> getMethodName() {
+        return new ResponseEntity<>("you're accepted!", HttpStatus.OK);
     }
 
     @PostMapping("/logged-user-products")

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.advancia.spring.api.dao.UserRestDAO;
 import com.advancia.spring.api.dto.user.UserDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
@@ -39,37 +41,55 @@ public class UserRestService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public AuthenticationResponseDTO signUp(User request) {
+    public AuthenticationResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
+
+        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
+
+        if (userService.loadUserByUsername(userSignUpDataDTO.getEmail()) != null) {
+            responseDTO.setEsito(false);
+            responseDTO.setMessaggio("Questa e-mail è già presente nel nostro sistema");
+            System.out.println(responseDTO);
+            return responseDTO;
+        }
 
         User user = new User(
-                request.getNome(),
-                request.getCognome(),
-                request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                request.getDataDiNascita());
+                userSignUpDataDTO.getNome(),
+                userSignUpDataDTO.getCognome(),
+                userSignUpDataDTO.getEmail(),
+                passwordEncoder.encode(userSignUpDataDTO.getPassword()),
+                userSignUpDataDTO.getDataDiNascita(),
+                userSignUpDataDTO.getRuolo());
 
         userService.save(user);
 
         String token = jwtService.generateToken(user);
 
-        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO(token);
+        responseDTO.setEsito(true);
+        responseDTO.setToken(token);
+        responseDTO.setMessaggio("");
 
+        System.out.println(responseDTO);
         return responseDTO;
     }
 
-    public AuthenticationResponseDTO login(User request) {
+    public AuthenticationResponseDTO login(UserLoginDataDTO userLoginDataDTO) {
+
+        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
 
         authenticationManager
                 .authenticate(
                         new UsernamePasswordAuthenticationToken(
-                                request.getUsername(),
-                                request.getPassword()));
+                                userLoginDataDTO.getUsername(),
+                                userLoginDataDTO.getPassword()));
 
-        User user = userService.loadUserByUsername(request.getUsername());
+        User user = userService.loadUserByUsername(userLoginDataDTO.getEmail());
         String token = jwtService.generateToken(user);
 
-        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO(token);
+        responseDTO.setEsito(true);
+        responseDTO.setToken(token);
+        responseDTO.setMessaggio("");
 
+        System.out.println(responseDTO);
         return responseDTO;
     }
 

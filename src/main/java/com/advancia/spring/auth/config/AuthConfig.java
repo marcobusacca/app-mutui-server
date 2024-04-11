@@ -9,11 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.auth.filter.JwtAuthenticationFilter;
 
 @Configuration
@@ -24,16 +25,10 @@ public class AuthConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        // http.csrf(csrf -> csrf.disable())
-        // .authorizeHttpRequests(requests -> requests
-        // .requestMatchers("/api/**").permitAll());
-
-        // return http.build();
 
         return http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -42,17 +37,12 @@ public class AuthConfig {
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
-                .userDetailsService(userDetailsService)
+                .userDetailsService(userService)
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-    // @Bean
-    // UserDetailsService userDetailsService() {
-    // return new UserService();
-    // }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,49 +53,4 @@ public class AuthConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-    // @Bean
-    // DaoAuthenticationProvider authenticationProvider() {
-
-    // DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-
-    // authProvider.setUserDetailsService(userDetailsService());
-    // authProvider.setPasswordEncoder(passwordEncoder());
-
-    // return authProvider;
-    // }
-
-    // @Bean
-    // FilterRegistrationBean<CorsFilter> getCorsSettings() {
-
-    // final CorsConfiguration config = new CorsConfiguration();
-
-    // // OPTIONS
-    // // config.setAllowCredentials(true);
-
-    // config.addAllowedOrigin("http://localhost:4200"); // DEVELOP FE SERVER
-
-    // // HEADERS
-    // config.addAllowedHeader("Content-Type");
-    // config.addAllowedHeader("Authorization");
-    // config.addAllowedHeader("X-XSRF-TOKEN");
-    // config.addAllowedHeader("Accept");
-
-    // // METHODS
-    // config.addAllowedMethod(HttpMethod.GET);
-    // config.addAllowedMethod(HttpMethod.POST);
-    // config.addAllowedMethod(HttpMethod.PUT);
-    // config.addAllowedMethod(HttpMethod.DELETE);
-
-    // // SET CONFIG ON PATHS
-    // final UrlBasedCorsConfigurationSource source = new
-    // UrlBasedCorsConfigurationSource();
-    // source.registerCorsConfiguration("/**", config);
-
-    // final FilterRegistrationBean<CorsFilter> bean = new
-    // FilterRegistrationBean<>(new CorsFilter(source));
-    // bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-
-    // return bean;
-    // }
 }
