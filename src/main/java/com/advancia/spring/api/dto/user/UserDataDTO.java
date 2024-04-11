@@ -1,6 +1,6 @@
 package com.advancia.spring.api.dto.user;
 
-public class LoggedUserDTO {
+public class UserDataDTO {
 
     private int eta;
     private boolean cliente;

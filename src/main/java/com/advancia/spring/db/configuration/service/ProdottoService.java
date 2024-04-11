@@ -23,16 +23,10 @@ public class ProdottoService {
     }
 
     public void save(Prodotto prodotto) {
-        if (prodotto == null) {
-            return;
-        }
         prodottoRepository.save(prodotto);
     }
 
     public void delete(Prodotto prodotto) {
-        if (prodotto == null) {
-            return;
-        }
         prodottoRepository.delete(prodotto);
     }
 }

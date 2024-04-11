@@ -23,16 +23,10 @@ public class CampiService {
     }
 
     public void save(Campi campi) {
-        if (campi == null) {
-            return;
-        }
         campiRepository.save(campi);
     }
 
     public void delete(Campi campi) {
-        if (campi == null) {
-            return;
-        }
         campiRepository.delete(campi);
     }
 }

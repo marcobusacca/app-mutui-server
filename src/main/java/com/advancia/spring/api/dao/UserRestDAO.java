@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.advancia.spring.api.dto.user.LoggedUserDTO;
+import com.advancia.spring.api.dto.user.UserDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
@@ -30,7 +30,7 @@ public class UserRestDAO {
     @Autowired
     private DataSource dataSource;
 
-    public List<Prodotto> getAvailableProducts(LoggedUserDTO loggedUserDTO) throws SQLException {
+    public List<Prodotto> getAvailableProducts(UserDataDTO userDataDTO) throws SQLException {
 
         // LISTA PRODOTTI DISPONIBILI PER L'UTENTE ATTUALMENTE LOGGATO
         List<Prodotto> prodottiDisponibili = new ArrayList<>();
@@ -73,11 +73,11 @@ public class UserRestDAO {
                 if (prodottoConVincolo.isPresent()) {
 
                     if (vincolo.isCliente()) {
-                        if (!loggedUserDTO.isCliente()) {
+                        if (!userDataDTO.isCliente()) {
                             continue;
                         }
                     }
-                    if (vincolo.getEta() <= loggedUserDTO.getEta()) {
+                    if (vincolo.getEta() <= userDataDTO.getEta()) {
                         continue;
                     }
 

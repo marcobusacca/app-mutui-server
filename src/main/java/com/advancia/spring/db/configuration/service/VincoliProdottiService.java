@@ -23,16 +23,10 @@ public class VincoliProdottiService {
     }
 
     public void save(VincoliProdotti vincoliProdotti) {
-        if (vincoliProdotti == null) {
-            return;
-        }
         vincoliProdottiRepository.save(vincoliProdotti);
     }
 
     public void delete(VincoliProdotti vincoliProdotti) {
-        if (vincoliProdotti == null) {
-            return;
-        }
         vincoliProdottiRepository.delete(vincoliProdotti);
     }
 }

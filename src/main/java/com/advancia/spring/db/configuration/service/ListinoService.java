@@ -23,16 +23,10 @@ public class ListinoService {
     }
 
     public void save(Listino listino) {
-        if (listino == null) {
-            return;
-        }
         listinoRepository.save(listino);
     }
 
     public void delete(Listino listino) {
-        if (listino == null) {
-            return;
-        }
         listinoRepository.delete(listino);
     }
 }
