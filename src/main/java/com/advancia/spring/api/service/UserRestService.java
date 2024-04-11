@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +49,6 @@ public class UserRestService {
         if (userService.loadUserByUsername(userSignUpDataDTO.getEmail()) != null) {
             responseDTO.setEsito(false);
             responseDTO.setMessaggio("Questa e-mail è già presente nel nostro sistema");
-            System.out.println(responseDTO);
             return responseDTO;
         }
 
@@ -68,7 +68,6 @@ public class UserRestService {
         responseDTO.setToken(token);
         responseDTO.setMessaggio("");
 
-        System.out.println(responseDTO);
         return responseDTO;
     }
 
@@ -76,20 +75,25 @@ public class UserRestService {
 
         AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
 
-        authenticationManager
-                .authenticate(
-                        new UsernamePasswordAuthenticationToken(
-                                userLoginDataDTO.getUsername(),
-                                userLoginDataDTO.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            userLoginDataDTO.getUsername(),
+                            userLoginDataDTO.getPassword()));
 
-        User user = userService.loadUserByUsername(userLoginDataDTO.getEmail());
-        String token = jwtService.generateToken(user);
+            User user = userService.loadUserByUsername(userLoginDataDTO.getEmail());
+            String token = jwtService.generateToken(user);
 
-        responseDTO.setEsito(true);
-        responseDTO.setToken(token);
-        responseDTO.setMessaggio("");
+            responseDTO.setEsito(true);
+            responseDTO.setToken(token);
+            responseDTO.setMessaggio("");
 
-        System.out.println(responseDTO);
+        } catch (AuthenticationException e) {
+
+            responseDTO.setEsito(false);
+            responseDTO.setMessaggio("Credenziali non valide");
+        }
+
         return responseDTO;
     }
 
