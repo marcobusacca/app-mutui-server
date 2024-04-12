@@ -14,7 +14,6 @@ import com.advancia.spring.api.dto.user.UserDataDTO;
 import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
 import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
-import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
 import com.advancia.spring.api.service.UserRestService;
 
@@ -26,15 +25,15 @@ public class UserRestController {
     @Autowired
     private UserRestService userRestService;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponseDTO> signUp(@RequestBody UserSignUpDataDTO userSignUpDataDTO) {
-        AuthenticationResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO);
+    @PostMapping("/sign-up")
+    public ResponseEntity<LoggedUserResponseDTO> signUp(@RequestBody UserSignUpDataDTO userSignUpDataDTO) {
+        LoggedUserResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponseDTO> login(@RequestBody UserLoginDataDTO userLoginDataDTO) {
-        AuthenticationResponseDTO responseDTO = userRestService.login(userLoginDataDTO);
+    public ResponseEntity<LoggedUserResponseDTO> login(@RequestBody UserLoginDataDTO userLoginDataDTO) {
+        LoggedUserResponseDTO responseDTO = userRestService.login(userLoginDataDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

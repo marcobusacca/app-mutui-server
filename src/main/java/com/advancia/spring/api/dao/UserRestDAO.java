@@ -16,11 +16,22 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.advancia.spring.api.dto.user.UserDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
+import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
+import com.advancia.spring.api.dto.user.response.LoggedUserAuthDataDTO;
+import com.advancia.spring.auth.db.pojo.Role;
+import com.advancia.spring.auth.db.pojo.User;
+import com.advancia.spring.auth.db.service.UserService;
+import com.advancia.spring.auth.service.JwtService;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
 import com.advancia.spring.db.configuration.pojo.VincoliProdotti;
 
@@ -29,6 +40,72 @@ public class UserRestDAO {
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    public LoggedUserAuthDataDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
+
+        LoggedUserAuthDataDTO authDataDTO = new LoggedUserAuthDataDTO();
+
+        userSignUpDataDTO.setRuolo(Role.USER);
+
+        User user = new User(
+                userSignUpDataDTO.getNome(),
+                userSignUpDataDTO.getCognome(),
+                userSignUpDataDTO.getEmail(),
+                passwordEncoder.encode(userSignUpDataDTO.getPassword()),
+                userSignUpDataDTO.getDataDiNascita(),
+                userSignUpDataDTO.getRuolo());
+
+        userService.save(user);
+
+        String token = jwtService.generateToken(user);
+        Long tokenExpiration = jwtService.getTokenExpiration(token);
+
+        authDataDTO.setToken(token);
+        authDataDTO.setTokenExpiration(tokenExpiration);
+        authDataDTO.setNome(user.getNome());
+        authDataDTO.setCognome(user.getCognome());
+        authDataDTO.setEmail(user.getEmail());
+        authDataDTO.setPassword(user.getPassword());
+        authDataDTO.setDataDiNascita(user.getDataDiNascita());
+
+        return authDataDTO;
+    }
+
+    public LoggedUserAuthDataDTO login(UserLoginDataDTO userLoginDataDTO) throws AuthenticationException {
+
+        LoggedUserAuthDataDTO authDataDTO = new LoggedUserAuthDataDTO();
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userLoginDataDTO.getUsername(),
+                        userLoginDataDTO.getPassword()));
+
+        User user = userService.loadUserByUsername(userLoginDataDTO.getEmail());
+        String token = jwtService.generateToken(user);
+        Long tokenExpiration = jwtService.getTokenExpiration(token);
+
+        authDataDTO.setToken(token);
+        authDataDTO.setTokenExpiration(tokenExpiration);
+        authDataDTO.setNome(user.getNome());
+        authDataDTO.setCognome(user.getCognome());
+        authDataDTO.setEmail(user.getEmail());
+        authDataDTO.setPassword(user.getPassword());
+        authDataDTO.setDataDiNascita(user.getDataDiNascita());
+
+        return authDataDTO;
+    }
 
     public List<Prodotto> getAvailableProducts(UserDataDTO userDataDTO) throws SQLException {
 

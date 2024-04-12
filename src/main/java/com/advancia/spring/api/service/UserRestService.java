@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.advancia.spring.api.dao.UserRestDAO;
@@ -17,12 +14,9 @@ import com.advancia.spring.api.dto.user.UserDataDTO;
 import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
 import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
-import com.advancia.spring.api.dto.user.response.AuthenticationResponseDTO;
+import com.advancia.spring.api.dto.user.response.LoggedUserAuthDataDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
-import com.advancia.spring.auth.db.pojo.Role;
-import com.advancia.spring.auth.db.pojo.User;
 import com.advancia.spring.auth.db.service.UserService;
-import com.advancia.spring.auth.service.JwtService;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
 
 @Service
@@ -32,67 +26,40 @@ public class UserRestService {
     private UserRestDAO userRestDAO;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
+    public LoggedUserResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    public AuthenticationResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
-
-        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
-
-        userSignUpDataDTO.setRuolo(Role.USER);
+        LoggedUserResponseDTO responseDTO = new LoggedUserResponseDTO();
 
         if (userService.loadUserByUsername(userSignUpDataDTO.getEmail()) != null) {
+            responseDTO.setResponse(new HashMap<>());
             responseDTO.setEsito(false);
             responseDTO.setMessaggio("Questa e-mail è già presente nel nostro sistema");
             return responseDTO;
         }
 
-        User user = new User(
-                userSignUpDataDTO.getNome(),
-                userSignUpDataDTO.getCognome(),
-                userSignUpDataDTO.getEmail(),
-                passwordEncoder.encode(userSignUpDataDTO.getPassword()),
-                userSignUpDataDTO.getDataDiNascita(),
-                userSignUpDataDTO.getRuolo());
+        LoggedUserAuthDataDTO authDataDTO = userRestDAO.signUp(userSignUpDataDTO);
 
-        userService.save(user);
-
-        String token = jwtService.generateToken(user);
-
+        responseDTO.setResponse(authDataDTO);
         responseDTO.setEsito(true);
-        responseDTO.setToken(token);
         responseDTO.setMessaggio("");
 
         return responseDTO;
     }
 
-    public AuthenticationResponseDTO login(UserLoginDataDTO userLoginDataDTO) {
+    public LoggedUserResponseDTO login(UserLoginDataDTO userLoginDataDTO) {
 
-        AuthenticationResponseDTO responseDTO = new AuthenticationResponseDTO();
+        LoggedUserResponseDTO responseDTO = new LoggedUserResponseDTO();
 
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userLoginDataDTO.getUsername(),
-                            userLoginDataDTO.getPassword()));
-
-            User user = userService.loadUserByUsername(userLoginDataDTO.getEmail());
-            String token = jwtService.generateToken(user);
-
+            LoggedUserAuthDataDTO authDataDTO = userRestDAO.login(userLoginDataDTO);
+            responseDTO.setResponse(authDataDTO);
             responseDTO.setEsito(true);
-            responseDTO.setToken(token);
             responseDTO.setMessaggio("");
 
         } catch (AuthenticationException e) {
-
+            responseDTO.setResponse(new HashMap<>());
             responseDTO.setEsito(false);
             responseDTO.setMessaggio("Credenziali non valide");
         }
