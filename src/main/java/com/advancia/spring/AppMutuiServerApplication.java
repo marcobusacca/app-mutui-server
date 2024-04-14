@@ -1,9 +1,18 @@
 package com.advancia.spring;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.advancia.spring.auth.db.pojo.Role;
+import com.advancia.spring.auth.db.pojo.User;
+import com.advancia.spring.auth.db.pojo.UserImage;
+import com.advancia.spring.auth.db.service.UserImageService;
+import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.db.configuration.pojo.Campi;
 import com.advancia.spring.db.configuration.pojo.Listino;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
@@ -15,6 +24,15 @@ import com.advancia.spring.db.configuration.service.VincoliProdottiService;
 
 @SpringBootApplication
 public class AppMutuiServerApplication {
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private UserImageService userImageService;
 
 	@Autowired
 	private ProdottoService prodottoService;
@@ -32,10 +50,34 @@ public class AppMutuiServerApplication {
 		AppMutuiServerApplication app = SpringApplication.run(AppMutuiServerApplication.class, args)
 				.getBean(AppMutuiServerApplication.class);
 
+		// app.createUser();
 		app.createProdotti();
 		app.createVincoliProdotti();
 		app.createCampi();
 		app.createListino();
+	}
+
+	public void createUser() {
+		String userImageNome = "immagine_profilo.jpg";
+		String userImageType = "image/jpeg";
+		byte[] userImagePicByte = { (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x90, (byte) 0xAB,
+				(byte) 0xCD, (byte) 0xEF };
+
+		UserImage userImage = new UserImage(userImageNome, userImageType, userImagePicByte);
+		userImageService.save(userImage);
+
+		String userNome = "marco";
+		String userCognome = "busacca";
+		String userEmail = "marcobusacca@gmail.com";
+		String userPassword = "marcobusacca";
+
+		LocalDate localDate = LocalDate.of(2003, 12, 30);
+		Date userDataDiNascita = Date.valueOf(localDate);
+
+		User user = new User(userNome, userCognome, userEmail, passwordEncoder.encode(userPassword),
+				userDataDiNascita,
+				Role.USER, userImage);
+		userService.save(user);
 	}
 
 	public void createProdotti() {
