@@ -15,6 +15,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class User implements UserDetails {
@@ -42,16 +44,22 @@ public class User implements UserDetails {
     @Column(nullable = false)
     Role ruolo;
 
+    @OneToOne()
+    @JoinColumn(name = "user_image_id", referencedColumnName = "id", nullable = false)
+    private UserImage userImage;
+
     public User() {
     }
 
-    public User(String nome, String cognome, String email, String password, Date dataDiNascita, Role ruolo) {
+    public User(String nome, String cognome, String email, String password, Date dataDiNascita, Role ruolo,
+            UserImage userImage) {
         setNome(nome);
         setCognome(cognome);
         setEmail(email);
         setPassword(password);
         setDataDiNascita(dataDiNascita);
         setRuolo(ruolo);
+        setUserImage(userImage);
     }
 
     public int getId() {
@@ -110,6 +118,14 @@ public class User implements UserDetails {
         this.ruolo = ruolo;
     }
 
+    public UserImage getUserImage() {
+        return this.userImage;
+    }
+
+    public void setUserImage(UserImage userImage) {
+        this.userImage = userImage;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(ruolo.name()));
@@ -150,6 +166,7 @@ public class User implements UserDetails {
                 ", password='" + getPassword() + "'" +
                 ", dataDiNascita='" + getDataDiNascita() + "'" +
                 ", ruolo='" + getRuolo() + "'" +
+                ", userImage='" + (getUserImage() != null ? getUserImage().getNome() : null) + "'" +
                 "}";
     }
 }

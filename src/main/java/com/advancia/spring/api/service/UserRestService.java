@@ -1,5 +1,6 @@
 package com.advancia.spring.api.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.advancia.spring.api.dao.UserRestDAO;
 import com.advancia.spring.api.dto.user.UserDataDTO;
@@ -28,7 +30,7 @@ public class UserRestService {
     @Autowired
     private UserService userService;
 
-    public LoggedUserResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
+    public LoggedUserResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO, MultipartFile userImageFile) {
 
         LoggedUserResponseDTO responseDTO = new LoggedUserResponseDTO();
 
@@ -39,11 +41,16 @@ public class UserRestService {
             return responseDTO;
         }
 
-        LoggedUserAuthDataDTO authDataDTO = userRestDAO.signUp(userSignUpDataDTO);
-
-        responseDTO.setResponse(authDataDTO);
-        responseDTO.setEsito(true);
-        responseDTO.setMessaggio("");
+        try {
+            LoggedUserAuthDataDTO authDataDTO = userRestDAO.signUp(userSignUpDataDTO, userImageFile);
+            responseDTO.setResponse(authDataDTO);
+            responseDTO.setEsito(true);
+            responseDTO.setMessaggio("");
+        } catch (IOException e) {
+            responseDTO.setResponse(new HashMap<>());
+            responseDTO.setEsito(false);
+            responseDTO.setMessaggio("Errore di connessione. Riprovare più tardi.");
+        }
 
         return responseDTO;
     }

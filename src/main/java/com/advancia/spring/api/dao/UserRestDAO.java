@@ -1,5 +1,6 @@
 package com.advancia.spring.api.dao;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,6 +22,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.advancia.spring.api.dto.user.UserDataDTO;
 import com.advancia.spring.api.dto.user.auth.UserLoginDataDTO;
@@ -30,6 +32,8 @@ import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserAuthDataDTO;
 import com.advancia.spring.auth.db.pojo.Role;
 import com.advancia.spring.auth.db.pojo.User;
+import com.advancia.spring.auth.db.pojo.UserImage;
+import com.advancia.spring.auth.db.service.UserImageService;
 import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.auth.service.JwtService;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
@@ -45,6 +49,9 @@ public class UserRestDAO {
     private UserService userService;
 
     @Autowired
+    private UserImageService userImageService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -53,11 +60,17 @@ public class UserRestDAO {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public LoggedUserAuthDataDTO signUp(UserSignUpDataDTO userSignUpDataDTO) {
+    public LoggedUserAuthDataDTO signUp(UserSignUpDataDTO userSignUpDataDTO, MultipartFile userImageFile)
+            throws IOException {
 
         LoggedUserAuthDataDTO authDataDTO = new LoggedUserAuthDataDTO();
 
-        userSignUpDataDTO.setRuolo(Role.USER);
+        UserImage userImage = new UserImage(
+                userImageFile.getOriginalFilename(),
+                userImageFile.getContentType(),
+                userImageFile.getBytes());
+
+        userImageService.save(userImage);
 
         User user = new User(
                 userSignUpDataDTO.getNome(),
@@ -65,7 +78,8 @@ public class UserRestDAO {
                 userSignUpDataDTO.getEmail(),
                 passwordEncoder.encode(userSignUpDataDTO.getPassword()),
                 userSignUpDataDTO.getDataDiNascita(),
-                userSignUpDataDTO.getRuolo());
+                Role.USER,
+                userImage);
 
         userService.save(user);
 
@@ -74,11 +88,7 @@ public class UserRestDAO {
 
         authDataDTO.setToken(token);
         authDataDTO.setTokenExpiration(tokenExpiration);
-        authDataDTO.setNome(user.getNome());
-        authDataDTO.setCognome(user.getCognome());
-        authDataDTO.setEmail(user.getEmail());
-        authDataDTO.setPassword(user.getPassword());
-        authDataDTO.setDataDiNascita(user.getDataDiNascita());
+        authDataDTO.setUser(user);
 
         return authDataDTO;
     }
@@ -98,11 +108,7 @@ public class UserRestDAO {
 
         authDataDTO.setToken(token);
         authDataDTO.setTokenExpiration(tokenExpiration);
-        authDataDTO.setNome(user.getNome());
-        authDataDTO.setCognome(user.getCognome());
-        authDataDTO.setEmail(user.getEmail());
-        authDataDTO.setPassword(user.getPassword());
-        authDataDTO.setDataDiNascita(user.getDataDiNascita());
+        authDataDTO.setUser(user);
 
         return authDataDTO;
     }
