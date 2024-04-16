@@ -45,8 +45,9 @@ public class UserRestController {
     @PostMapping(value = { "/sign-up" }, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LoggedUserResponseDTO> signUp(
             @RequestPart("user") UserSignUpDataDTO userSignUpDataDTO,
-            @RequestPart("userImage") MultipartFile userImageFile) {
-        LoggedUserResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO, userImageFile);
+            @RequestPart("userImage") MultipartFile userImageFile,
+            @RequestPart("userAudio") MultipartFile userAudioFile) {
+        LoggedUserResponseDTO responseDTO = userRestService.signUp(userSignUpDataDTO, userImageFile, userAudioFile);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 

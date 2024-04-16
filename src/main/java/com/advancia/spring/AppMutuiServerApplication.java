@@ -50,34 +50,10 @@ public class AppMutuiServerApplication {
 		AppMutuiServerApplication app = SpringApplication.run(AppMutuiServerApplication.class, args)
 				.getBean(AppMutuiServerApplication.class);
 
-		// app.createUser();
 		app.createProdotti();
 		app.createVincoliProdotti();
 		app.createCampi();
 		app.createListino();
-	}
-
-	public void createUser() {
-		String userImageNome = "immagine_profilo.jpg";
-		String userImageType = "image/jpeg";
-		byte[] userImagePicByte = { (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x90, (byte) 0xAB,
-				(byte) 0xCD, (byte) 0xEF };
-
-		UserImage userImage = new UserImage(userImageNome, userImageType, userImagePicByte);
-		userImageService.save(userImage);
-
-		String userNome = "marco";
-		String userCognome = "busacca";
-		String userEmail = "marcobusacca@gmail.com";
-		String userPassword = "marcobusacca";
-
-		LocalDate localDate = LocalDate.of(2003, 12, 30);
-		Date userDataDiNascita = Date.valueOf(localDate);
-
-		User user = new User(userNome, userCognome, userEmail, passwordEncoder.encode(userPassword),
-				userDataDiNascita,
-				Role.USER, userImage);
-		userService.save(user);
 	}
 
 	public void createProdotti() {

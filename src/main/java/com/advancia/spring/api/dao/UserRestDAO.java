@@ -32,7 +32,9 @@ import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserAuthDataDTO;
 import com.advancia.spring.auth.db.pojo.Role;
 import com.advancia.spring.auth.db.pojo.User;
+import com.advancia.spring.auth.db.pojo.UserAudio;
 import com.advancia.spring.auth.db.pojo.UserImage;
+import com.advancia.spring.auth.db.service.UserAudioService;
 import com.advancia.spring.auth.db.service.UserImageService;
 import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.auth.service.JwtService;
@@ -52,6 +54,9 @@ public class UserRestDAO {
     private UserImageService userImageService;
 
     @Autowired
+    private UserAudioService userAudioService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -60,7 +65,10 @@ public class UserRestDAO {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public LoggedUserAuthDataDTO signUp(UserSignUpDataDTO userSignUpDataDTO, MultipartFile userImageFile)
+    public LoggedUserAuthDataDTO signUp(
+            UserSignUpDataDTO userSignUpDataDTO,
+            MultipartFile userImageFile,
+            MultipartFile userAudioFile)
             throws IOException {
 
         LoggedUserAuthDataDTO authDataDTO = new LoggedUserAuthDataDTO();
@@ -72,6 +80,13 @@ public class UserRestDAO {
 
         userImageService.save(userImage);
 
+        UserAudio userAudio = new UserAudio(
+                userSignUpDataDTO.getEmail() + ".wav",
+                userAudioFile.getContentType(),
+                userAudioFile.getBytes());
+
+        userAudioService.save(userAudio);
+
         User user = new User(
                 userSignUpDataDTO.getNome(),
                 userSignUpDataDTO.getCognome(),
@@ -79,7 +94,8 @@ public class UserRestDAO {
                 passwordEncoder.encode(userSignUpDataDTO.getPassword()),
                 userSignUpDataDTO.getDataDiNascita(),
                 Role.USER,
-                userImage);
+                userImage,
+                userAudio);
 
         userService.save(user);
 

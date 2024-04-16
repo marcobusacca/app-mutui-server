@@ -48,11 +48,15 @@ public class User implements UserDetails {
     @JoinColumn(name = "user_image_id", referencedColumnName = "id", nullable = false)
     private UserImage userImage;
 
+    @OneToOne()
+    @JoinColumn(name = "user_audio_id", referencedColumnName = "id", nullable = false)
+    private UserAudio userAudio;
+
     public User() {
     }
 
     public User(String nome, String cognome, String email, String password, Date dataDiNascita, Role ruolo,
-            UserImage userImage) {
+            UserImage userImage, UserAudio userAudio) {
         setNome(nome);
         setCognome(cognome);
         setEmail(email);
@@ -60,6 +64,7 @@ public class User implements UserDetails {
         setDataDiNascita(dataDiNascita);
         setRuolo(ruolo);
         setUserImage(userImage);
+        setUserAudio(userAudio);
     }
 
     public int getId() {
@@ -126,6 +131,14 @@ public class User implements UserDetails {
         this.userImage = userImage;
     }
 
+    public UserAudio getUserAudio() {
+        return this.userAudio;
+    }
+
+    public void setUserAudio(UserAudio userAudio) {
+        this.userAudio = userAudio;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(ruolo.name()));
@@ -166,7 +179,8 @@ public class User implements UserDetails {
                 ", password='" + getPassword() + "'" +
                 ", dataDiNascita='" + getDataDiNascita() + "'" +
                 ", ruolo='" + getRuolo() + "'" +
-                ", userImage='" + (getUserImage() != null ? getUserImage().getNome() : null) + "'" +
+                ", userImage='" + getUserImage() + "'" +
+                ", userAudio='" + getUserAudio() + "'" +
                 "}";
     }
 }

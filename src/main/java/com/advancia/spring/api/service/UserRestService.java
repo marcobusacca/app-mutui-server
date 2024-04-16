@@ -30,7 +30,10 @@ public class UserRestService {
     @Autowired
     private UserService userService;
 
-    public LoggedUserResponseDTO signUp(UserSignUpDataDTO userSignUpDataDTO, MultipartFile userImageFile) {
+    public LoggedUserResponseDTO signUp(
+            UserSignUpDataDTO userSignUpDataDTO,
+            MultipartFile userImageFile,
+            MultipartFile userAudioFile) {
 
         LoggedUserResponseDTO responseDTO = new LoggedUserResponseDTO();
 
@@ -42,7 +45,7 @@ public class UserRestService {
         }
 
         try {
-            LoggedUserAuthDataDTO authDataDTO = userRestDAO.signUp(userSignUpDataDTO, userImageFile);
+            LoggedUserAuthDataDTO authDataDTO = userRestDAO.signUp(userSignUpDataDTO, userImageFile, userAudioFile);
             responseDTO.setResponse(authDataDTO);
             responseDTO.setEsito(true);
             responseDTO.setMessaggio("");
