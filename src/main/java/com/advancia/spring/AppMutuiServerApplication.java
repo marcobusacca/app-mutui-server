@@ -1,18 +1,8 @@
 package com.advancia.spring;
 
-import java.sql.Date;
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.advancia.spring.auth.db.pojo.Role;
-import com.advancia.spring.auth.db.pojo.User;
-import com.advancia.spring.auth.db.pojo.UserImage;
-import com.advancia.spring.auth.db.service.UserImageService;
-import com.advancia.spring.auth.db.service.UserService;
 import com.advancia.spring.db.configuration.pojo.Campi;
 import com.advancia.spring.db.configuration.pojo.Listino;
 import com.advancia.spring.db.configuration.pojo.Prodotto;
@@ -24,15 +14,6 @@ import com.advancia.spring.db.configuration.service.VincoliProdottiService;
 
 @SpringBootApplication
 public class AppMutuiServerApplication {
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private UserImageService userImageService;
 
 	@Autowired
 	private ProdottoService prodottoService;
