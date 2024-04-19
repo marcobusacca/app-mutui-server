@@ -5,8 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,10 +19,6 @@ import com.advancia.spring.api.dto.user.auth.UserSignUpDataDTO;
 import com.advancia.spring.api.dto.user.form.LoggedUserFormDataDTO;
 import com.advancia.spring.api.dto.user.response.LoggedUserResponseDTO;
 import com.advancia.spring.api.service.UserRestService;
-import com.advancia.spring.auth.db.pojo.User;
-import com.advancia.spring.auth.db.service.UserService;
-
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api")
@@ -32,15 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class UserRestController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private UserRestService userRestService;
-
-    @GetMapping("/test")
-    public ResponseEntity<List<User>> getUsers() {
-        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
-    }
 
     @PostMapping(value = { "/sign-up" }, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<LoggedUserResponseDTO> signUp(
